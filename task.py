@@ -26,15 +26,21 @@ class Task():
 
         # Goal
         self.target_pos = target_pos if target_pos is not None else np.array([0., 0., 10.])
+        self.init_dist = np.linalg.norm(self.sim.pose[:3] - self.target_pos)
+        self.dist = 0
 
     def get_reward(self):
         """Uses current pose of sim to return reward."""
 
-        d_pose = self.sim.pose[:3] - self.target_pos
-        d_x = d_pose[0]
-        d_y = d_pose[1]
-        d_z = d_pose[2]
-        reward = 1. - 0.5 * math.sqrt(math.pow(d_x, 2) + math.pow(d_y, 2) + math.pow(d_z, 2))
+        self.dist = np.linalg.norm(self.sim.pose[:3] - self.target_pos)
+        reward = self.init_dist - self.dist
+
+        # Clip reward to [1, -1]
+        if reward > 1:
+            reward = 1
+        elif reward < -1:
+            reward = -1
+
         return reward
 
     def step(self, rotor_speeds):
