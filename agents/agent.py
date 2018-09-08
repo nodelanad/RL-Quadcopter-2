@@ -166,7 +166,7 @@ class OUNoise:
         return self.state
 
 
-
+#Experience
 Experience = namedtuple("Experience",
     field_names=["state", "action", "reward", "next_state", "done"])
 
@@ -187,7 +187,7 @@ class ReplayBuffer:
 
     def sample(self, batch_size=64):
         """Randomly sample a batch of experiences from memory."""
-        return random.sample(self.memory, k=batch_size)
+        return random.sample(self.memory, k=self.batch_size)
 
     def __len__(self):
         """Return the current size of internal memory."""
@@ -218,8 +218,8 @@ class DDPG():
 
         # Noise process
         self.exploration_mu = 0
-        self.exploration_theta = 0.15
-        self.exploration_sigma = 0.2
+        self.exploration_theta = 0.08
+        self.exploration_sigma = 0.15
         self.noise = OUNoise(self.action_size, self.exploration_mu, self.exploration_theta, self.exploration_sigma)
 
 
@@ -230,7 +230,7 @@ class DDPG():
 
         # Algorithm parameters
         self.gamma = 0.99  # discount factor
-        self.tau = 0.01  # for soft update of target parameters
+        self.tau = 0.0001  # for soft update of target parameters
 
         # Score tracker and learning parameters
         self.score = 0
