@@ -324,5 +324,7 @@ class DDPG():
         local_weights = np.array(local_model.get_weights())
         target_weights = np.array(target_model.get_weights())
 
+        assert len(local_weights) == len(target_weights), "Local and target model parameters must have the same size"
+
         new_weights = self.tau * local_weights + (1 - self.tau) * target_weights
         target_model.set_weights(new_weights)
