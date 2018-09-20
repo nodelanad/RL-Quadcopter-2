@@ -66,7 +66,7 @@ class Actor:
         # Incorporate any additional losses here (e.g. from regularizers)
 
         # Define optimizer and training function
-        optimizer = optimizers.Adam(0.0001)
+        optimizer = optimizers.Adam()
         updates_op = optimizer.get_updates(params=self.model.trainable_weights, loss=loss)
         self.train_fn = K.function(
             inputs=[self.model.input, action_gradients, K.learning_phase()],
@@ -133,7 +133,7 @@ class Critic:
         self.model = models.Model(inputs=[states, actions], outputs=Q_values)
 
         # Define optimizer and compile model for training with built-in loss function
-        optimizer = optimizers.Adam(0.001)
+        optimizer = optimizers.Adam()
         self.model.compile(optimizer=optimizer, loss='mse')
 
         # Compute action gradients (derivative of Q values w.r.t. to actions)
@@ -167,9 +167,9 @@ class OUNoise:
 
 
 #Experience
-Experience = namedtuple("Experience",
-    field_names=["state", "action", "reward", "next_state", "done"])
-
+# Experience = namedtuple("Experience",
+#     field_names=["state", "action", "reward", "next_state", "done"])
+#
 
 class ReplayBuffer:
     """Fixed-size circular buffer to store experience tuples."""

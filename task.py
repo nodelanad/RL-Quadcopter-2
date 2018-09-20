@@ -35,12 +35,23 @@ class Task():
         # self.dist = np.linalg.norm(self.sim.pose[:3] - self.target_pos)
         # reward = self.init_dist - self.dist
         #
-        # # Clip reward to [1, -1]
-        # if reward > 1:
-        #     reward = 1
-        # elif reward < -1:
-        #     reward = -1
-        reward = 1.-.003*(abs(self.sim.pose[:3] - self.target_pos)).sum()
+
+
+        # Reward positive velocity along z-axis
+        reward = 0.0
+        reward += self.sim.v[2]  # reward positive velocity more
+
+        if (self.sim.pose[ 2] - self.target_pos[ 2])<0:
+            reward += self.sim.v[2]
+        else:
+            reward -=  self.sim.v[2]
+
+        # Reward positions close to target along z-axis
+        reward -= (abs(self.sim.pose[ 2] - self.target_pos[ 2])) #/ 2.0
+        # A lower sensativity towards drifting in the xy-plane
+        reward -= (abs(self.sim.pose[:2] - self.target_pos[:2])).sum() / 4.0
+        reward -= (abs(self.sim.angular_v[:3])).sum()
+
         return reward
 
     def step(self, rotor_speeds):
@@ -51,6 +62,10 @@ class Task():
             done = self.sim.next_timestep(rotor_speeds) # update the sim pose and velocities
             reward += self.get_reward()
             pose_all.append(self.sim.pose)
+
+            if(self.sim.pose[2] >= self.target_pos[2]):
+                reward += 100
+                done = True
         next_state = np.concatenate(pose_all)
         return next_state, reward, done
 
